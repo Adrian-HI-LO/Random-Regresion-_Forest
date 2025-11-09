@@ -1,0 +1,97 @@
+╔════════════════════════════════════════════════════════════════╗
+║   Servidor Django - Detección de Malware en Android          ║
+╚════════════════════════════════════════════════════════════════╝
+
+✅ INSTALACIÓN COMPLETADA
+
+📋 INICIO RÁPIDO:
+
+1. Instalar dependencias (solo primera vez):
+   pip install -r requirements.txt
+
+2. Ejecutar migraciones (solo primera vez):
+   python manage.py migrate
+
+3. Iniciar el servidor:
+
+   Opción A - Script automático:
+   ./start_server.sh
+
+   Opción B - Comando directo:
+   python manage.py runserver
+
+4. Abrir en el navegador:
+   http://127.0.0.1:8000/
+
+
+🌐 RUTAS DISPONIBLES:
+
+├─ /                    → Página de inicio
+├─ /dashboard/          → Dashboard completo con todas las métricas
+├─ /classification/     → Random Forest Classifier (F1 Score destacado)
+├─ /regression/         → Random Forest Regressor (R² Score destacado)
+├─ /dataset/            → Exploración del dataset CICAAGM
+└─ /api/metrics/        → API JSON con todas las métricas
+
+
+📊 MÉTRICAS PRINCIPALES:
+
+RANDOM FOREST CLASSIFIER:
+  • F1 Score (Train, Validation, Test)
+  • Accuracy, Precision, Recall
+  • Matriz de Confusión
+  • Top 10 características importantes
+
+RANDOM FOREST REGRESSOR:
+  • R² Score (Train, Validation, Test)
+  • RMSE, MAE, MSE
+  • Top 10 características importantes
+
+
+⚠️  NOTAS IMPORTANTES:
+
+• La primera carga puede tardar 1-2 minutos mientras se:
+  - Carga el dataset (632,000 registros)
+  - Entrenan los modelos de Machine Learning
+  - Calculan todas las métricas
+
+• El servidor es INDEPENDIENTE del notebook Jupyter
+• Realiza su propio procesamiento de datos
+• Tema oscuro minimalista para mejor visualización
+• Responsive y optimizado para diferentes pantallas
+
+
+🎨 CARACTERÍSTICAS:
+
+✓ Procesamiento independiente de datos
+✓ Interfaz oscura y minimalista
+✓ Métricas completas en todos los conjuntos
+✓ Visualización de importancia de características
+✓ Tablas interactivas del dataset
+✓ API REST para integración
+
+
+📁 DATASET:
+
+Nombre: CICAAGM (Canadian Institute for Cybersecurity)
+Registros: ~632,000 flujos de red
+Características: 80 features
+Clases:
+  - Adware (250 apps)
+  - General Malware (150 apps)
+  - Benign (1,500 apps)
+
+
+🔗 AYUDA:
+
+• README completo: README.md
+• Documentación: En cada página del servidor
+• Dataset: https://www.unb.ca/cic/datasets/android-adware.html
+
+
+═══════════════════════════════════════════════════════════════
+
+🚀 Para iniciar: ./start_server.sh
+
+═══════════════════════════════════════════════════════════════
+

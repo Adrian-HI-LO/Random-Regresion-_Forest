@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+
+{% block title %}Clasificación - Malware Detector{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 2rem; font-size: 2.5rem;">🎯 Random Forest Classifier</h1>
+<p style="color: var(--text-secondary); margin-bottom: 2rem;">
+    Análisis detallado de la clasificación de malware en Android usando Random Forest
+</p>
+
+<!-- Métricas Principales -->
+<div class="card">
+    <h2 class="card-title">F1 Score - Métrica Principal</h2>
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-label">Entrenamiento</div>
+            <div class="metric-value" style="color: var(--success);">{{ metrics.train.f1_score|floatformat:4 }}</div>
+            <p style="color: var(--text-secondary); font-size: 0.875rem; margin-top: 0.5rem;">
+                F1 Score en conjunto de entrenamiento
+            </p>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Validación</div>
+            <div class="metric-value" style="color: var(--warning);">{{ metrics.validation.f1_score|floatformat:4 }}</div>
+            <p style="color: var(--text-secondary); font-size: 0.875rem; margin-top: 0.5rem;">
+                F1 Score en conjunto de validación
+            </p>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Test</div>
+            <div class="metric-value" style="color: var(--accent);">{{ metrics.test.f1_score|floatformat:4 }}</div>
+            <p style="color: var(--text-secondary); font-size: 0.875rem; margin-top: 0.5rem;">
+                F1 Score en conjunto de test
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Todas las Métricas -->
+<div class="card">
+    <h2 class="card-title">Métricas Completas por Conjunto</h2>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Conjunto de Datos</th>
+                    <th>Accuracy</th>
+                    <th>Precision</th>
+                    <th>Recall</th>
+                    <th>F1 Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Entrenamiento</strong></td>
+                    <td>{{ metrics.train.accuracy|floatformat:4 }}</td>
+                    <td>{{ metrics.train.precision|floatformat:4 }}</td>
+                    <td>{{ metrics.train.recall|floatformat:4 }}</td>
+                    <td><strong style="color: var(--success);">{{ metrics.train.f1_score|floatformat:4 }}</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>Validación</strong></td>
+                    <td>{{ metrics.validation.accuracy|floatformat:4 }}</td>
+                    <td>{{ metrics.validation.precision|floatformat:4 }}</td>
+                    <td>{{ metrics.validation.recall|floatformat:4 }}</td>
+                    <td><strong style="color: var(--warning);">{{ metrics.validation.f1_score|floatformat:4 }}</strong></td>
+                </tr>
+                <tr style="background-color: rgba(88, 166, 255, 0.1);">
+                    <td><strong>Test</strong></td>
+                    <td>{{ metrics.test.accuracy|floatformat:4 }}</td>
+                    <td>{{ metrics.test.precision|floatformat:4 }}</td>
+                    <td>{{ metrics.test.recall|floatformat:4 }}</td>
+                    <td><strong style="color: var(--accent);">{{ metrics.test.f1_score|floatformat:4 }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Métricas Individuales -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+    <div class="card">
+        <h3 class="card-title">Accuracy</h3>
+        <div style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: 6px; margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <span style="color: var(--text-secondary);">Train</span>
+                <strong style="color: var(--accent);">{{ metrics.train.accuracy|floatformat:4 }}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <span style="color: var(--text-secondary);">Validation</span>
+                <strong style="color: var(--accent);">{{ metrics.validation.accuracy|floatformat:4 }}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: var(--text-secondary);">Test</span>
+                <strong style="color: var(--success); font-size: 1.2rem;">{{ metrics.test.accuracy|floatformat:4 }}</strong>
+            </div>
+        </div>
+        <p style="color: var(--text-secondary); font-size: 0.875rem;">
+            Proporción de predicciones correctas sobre el total
+        </p>
+    </div>
+
+    <div class="card">
+        <h3 class="card-title">Precision</h3>
+        <div style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: 6px; margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <span style="color: var(--text-secondary);">Train</span>
+                <strong style="color: var(--accent);">{{ metrics.train.precision|floatformat:4 }}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <span style="color: var(--text-secondary);">Validation</span>
+                <strong style="color: var(--accent);">{{ metrics.validation.precision|floatformat:4 }}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: var(--text-secondary);">Test</span>
+                <strong style="color: var(--success); font-size: 1.2rem;">{{ metrics.test.precision|floatformat:4 }}</strong>
+            </div>
+        </div>
+        <p style="color: var(--text-secondary); font-size: 0.875rem;">
+            Proporción de positivos identificados correctamente
+        </p>
+    </div>
+
+    <div class="card">
+        <h3 class="card-title">Recall</h3>
+        <div style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: 6px; margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <span style="color: var(--text-secondary);">Train</span>
+                <strong style="color: var(--accent);">{{ metrics.train.recall|floatformat:4 }}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <span style="color: var(--text-secondary);">Validation</span>
+                <strong style="color: var(--accent);">{{ metrics.validation.recall|floatformat:4 }}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: var(--text-secondary);">Test</span>
+                <strong style="color: var(--success); font-size: 1.2rem;">{{ metrics.test.recall|floatformat:4 }}</strong>
+            </div>
+        </div>
+        <p style="color: var(--text-secondary); font-size: 0.875rem;">
+            Capacidad para encontrar todos los casos positivos
+        </p>
+    </div>
+</div>
+
+<!-- Matriz de Confusión -->
+{% if metrics.confusion_matrix %}
+<div class="card">
+    <h2 class="card-title">Matriz de Confusión (Test Set)</h2>
+    <div class="table-container">
+        <table style="text-align: center;">
+            <thead>
+                <tr>
+                    <th style="text-align: center;">Real \ Predicho</th>
+                    {% for label in metrics.classification_report %}
+                        {% if label != 'accuracy' and label != 'macro avg' and label != 'weighted avg' %}
+                            <th style="text-align: center;">{{ label }}</th>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in metrics.confusion_matrix %}
+                <tr>
+                    <td><strong>Clase {{ forloop.counter0 }}</strong></td>
+                    {% for value in row %}
+                        <td style="background: rgba(88, 166, 255, {{ value|add:100|floatformat:0|add:'0'|slice:'-2:' }}); font-weight: 600;">
+                            {{ value }}
+                        </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<!-- Importancia de Características -->
+{% if feature_importance %}
+<div class="card">
+    <h2 class="card-title">Top 10 - Características Más Importantes</h2>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Ranking</th>
+                    <th>Característica</th>
+                    <th>Importancia</th>
+                    <th>Barra Visual</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in feature_importance %}
+                <tr>
+                    <td><strong>{{ forloop.counter }}</strong></td>
+                    <td>{{ item.feature }}</td>
+                    <td>{{ item.importance|floatformat:6 }}</td>
+                    <td>
+                        <div style="background: var(--bg-tertiary); height: 20px; border-radius: 10px; overflow: hidden;">
+                            <div style="background: linear-gradient(90deg, var(--accent), var(--success));
+                                        width: {{ item.importance|floatformat:4|add:'0'|slice:'2:'|add:'%'|cut:' ' }};
+                                        height: 100%;"></div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<div style="text-align: center; margin-top: 2rem;">
+    <a href="/dashboard/" class="btn">Volver al Dashboard</a>
+</div>
+{% endblock %}
+

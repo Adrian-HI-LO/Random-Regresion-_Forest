@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Malware Detector{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 2rem; font-size: 2.5rem;">Dashboard - Análisis Completo</h1>
+
+<!-- Clasificación -->
+<div class="card">
+    <h2 class="card-title">🎯 Random Forest Classifier</h2>
+    <h3 style="color: var(--text-secondary); margin-bottom: 1.5rem;">Detección de Malware</h3>
+
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-label">F1 Score (Train)</div>
+            <div class="metric-value">{{ clf_metrics.train.f1_score|floatformat:4 }}</div>
+            <span class="badge badge-success">Entrenamiento</span>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">F1 Score (Validation)</div>
+            <div class="metric-value">{{ clf_metrics.validation.f1_score|floatformat:4 }}</div>
+            <span class="badge badge-warning">Validación</span>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">F1 Score (Test)</div>
+            <div class="metric-value">{{ clf_metrics.test.f1_score|floatformat:4 }}</div>
+            <span class="badge badge-success">Test</span>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Accuracy (Test)</div>
+            <div class="metric-value">{{ clf_metrics.test.accuracy|floatformat:4 }}</div>
+            <span class="badge badge-success">Test</span>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 6px;">
+            <div style="color: var(--text-secondary); font-size: 0.875rem;">Precision (Test)</div>
+            <div style="font-size: 1.5rem; color: var(--accent);">{{ clf_metrics.test.precision|floatformat:4 }}</div>
+        </div>
+        <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 6px;">
+            <div style="color: var(--text-secondary); font-size: 0.875rem;">Recall (Test)</div>
+            <div style="font-size: 1.5rem; color: var(--accent);">{{ clf_metrics.test.recall|floatformat:4 }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Regresión -->
+<div class="card">
+    <h2 class="card-title">📊 Random Forest Regressor</h2>
+    <h3 style="color: var(--text-secondary); margin-bottom: 1.5rem;">Predicción de Duración del Tráfico</h3>
+
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-label">R² Score (Train)</div>
+            <div class="metric-value">{{ reg_metrics.train.r2|floatformat:4 }}</div>
+            <span class="badge badge-success">Entrenamiento</span>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">R² Score (Validation)</div>
+            <div class="metric-value">{{ reg_metrics.validation.r2|floatformat:4 }}</div>
+            <span class="badge badge-warning">Validación</span>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">R² Score (Test)</div>
+            <div class="metric-value">{{ reg_metrics.test.r2|floatformat:4 }}</div>
+            <span class="badge badge-success">Test</span>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">RMSE (Test)</div>
+            <div class="metric-value">{{ reg_metrics.test.rmse|floatformat:2 }}</div>
+            <span class="badge badge-warning">Test</span>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 6px;">
+            <div style="color: var(--text-secondary); font-size: 0.875rem;">MSE (Test)</div>
+            <div style="font-size: 1.5rem; color: var(--accent);">{{ reg_metrics.test.mse|floatformat:2 }}</div>
+        </div>
+        <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 6px;">
+            <div style="color: var(--text-secondary); font-size: 0.875rem;">MAE (Test)</div>
+            <div style="font-size: 1.5rem; color: var(--accent);">{{ reg_metrics.test.mae|floatformat:2 }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Comparación de Conjuntos -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem;">
+    <div class="card">
+        <h3 class="card-title">Clasificación - Todas las Métricas</h3>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Conjunto</th>
+                        <th>Accuracy</th>
+                        <th>Precision</th>
+                        <th>Recall</th>
+                        <th>F1 Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Train</strong></td>
+                        <td>{{ clf_metrics.train.accuracy|floatformat:4 }}</td>
+                        <td>{{ clf_metrics.train.precision|floatformat:4 }}</td>
+                        <td>{{ clf_metrics.train.recall|floatformat:4 }}</td>
+                        <td>{{ clf_metrics.train.f1_score|floatformat:4 }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Validation</strong></td>
+                        <td>{{ clf_metrics.validation.accuracy|floatformat:4 }}</td>
+                        <td>{{ clf_metrics.validation.precision|floatformat:4 }}</td>
+                        <td>{{ clf_metrics.validation.recall|floatformat:4 }}</td>
+                        <td>{{ clf_metrics.validation.f1_score|floatformat:4 }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Test</strong></td>
+                        <td>{{ clf_metrics.test.accuracy|floatformat:4 }}</td>
+                        <td>{{ clf_metrics.test.precision|floatformat:4 }}</td>
+                        <td>{{ clf_metrics.test.recall|floatformat:4 }}</td>
+                        <td>{{ clf_metrics.test.f1_score|floatformat:4 }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 class="card-title">Regresión - Todas las Métricas</h3>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Conjunto</th>
+                        <th>R²</th>
+                        <th>RMSE</th>
+                        <th>MAE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Train</strong></td>
+                        <td>{{ reg_metrics.train.r2|floatformat:4 }}</td>
+                        <td>{{ reg_metrics.train.rmse|floatformat:2 }}</td>
+                        <td>{{ reg_metrics.train.mae|floatformat:2 }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Validation</strong></td>
+                        <td>{{ reg_metrics.validation.r2|floatformat:4 }}</td>
+                        <td>{{ reg_metrics.validation.rmse|floatformat:2 }}</td>
+                        <td>{{ reg_metrics.validation.mae|floatformat:2 }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Test</strong></td>
+                        <td>{{ reg_metrics.test.r2|floatformat:4 }}</td>
+                        <td>{{ reg_metrics.test.rmse|floatformat:2 }}</td>
+                        <td>{{ reg_metrics.test.mae|floatformat:2 }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+    <a href="/classification/" class="btn">Ver Detalles de Clasificación</a>
+    <a href="/regression/" class="btn">Ver Detalles de Regresión</a>
+</div>
+{% endblock %}
+

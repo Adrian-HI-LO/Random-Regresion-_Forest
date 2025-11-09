@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block title %}Dataset - Malware Detector{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 2rem; font-size: 2.5rem;">📁 Dataset CICAAGM</h1>
+<p style="color: var(--text-secondary); margin-bottom: 2rem;">
+    Análisis de tráfico de red de aplicaciones Android (benignas y maliciosas)
+</p>
+
+<!-- Estadísticas del Dataset -->
+<div class="card">
+    <h2 class="card-title">Estadísticas Generales</h2>
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-label">Total de Registros</div>
+            <div class="metric-value">{{ stats.total_rows|floatformat:0 }}</div>
+            <span class="badge badge-success">Flujos de Red</span>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Total de Características</div>
+            <div class="metric-value">{{ stats.total_columns }}</div>
+            <span class="badge badge-success">Features</span>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Aplicaciones Benignas</div>
+            <div class="metric-value">{{ stats.benign_count|floatformat:0 }}</div>
+            <span class="badge badge-success">{{ stats.benign_count|floatformat:0|add:"/"|add:stats.total_rows|floatformat:0 }}</span>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Aplicaciones Maliciosas</div>
+            <div class="metric-value">{{ stats.malware_count|floatformat:0 }}</div>
+            <span class="badge badge-error">{{ stats.malware_count|floatformat:0|add:"/"|add:stats.total_rows|floatformat:0 }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- Información del Dataset -->
+<div class="card">
+    <h2 class="card-title">Descripción del Dataset</h2>
+    <div style="color: var(--text-secondary); line-height: 1.8;">
+        <p style="margin-bottom: 1rem;">
+            El dataset <strong>CICAAGM</strong> (Canadian Institute for Cybersecurity - Android Adware and General Malware)
+            contiene características extraídas del tráfico de red de 1,900 aplicaciones Android capturadas en dispositivos reales.
+        </p>
+
+        <h3 style="color: var(--text-primary); margin-top: 1.5rem; margin-bottom: 0.5rem;">Categorías:</h3>
+        <ul style="margin-left: 2rem; margin-bottom: 1rem;">
+            <li><strong style="color: var(--error);">Adware (250 apps):</strong> Airpush, Dowgin, Kemoge, Mobidash, Shuanet</li>
+            <li><strong style="color: var(--error);">General Malware (150 apps):</strong> AVpass, FakeAV, FakeFlash, GGtracker, Penetho</li>
+            <li><strong style="color: var(--success);">Benign (1,500 apps):</strong> Google Play Store apps (2015-2016)</li>
+        </ul>
+
+        <h3 style="color: var(--text-primary); margin-top: 1.5rem; margin-bottom: 0.5rem;">Características:</h3>
+        <p>
+            El dataset incluye 80 características extraídas usando <strong>CIC-FlowMeter</strong>, que analizan el tráfico de red
+            bidireccional incluyendo duración, paquetes, bytes, tiempos de inter-arribo, ventanas TCP, y más.
+        </p>
+    </div>
+</div>
+
+<!-- Preview del Dataset -->
+<div class="card">
+    <h2 class="card-title">Vista Previa - Primeras 100 Filas</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+        Mostrando las primeras 100 filas de {{ stats.total_rows|floatformat:0 }} registros totales
+    </p>
+
+    <div class="table-container" style="max-height: 600px; overflow-y: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th style="position: sticky; top: 0; background: var(--bg-tertiary); z-index: 10;">#</th>
+                    {% for col in columns %}
+                    <th style="position: sticky; top: 0; background: var(--bg-tertiary); z-index: 10;">{{ col }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td><strong>{{ forloop.counter }}</strong></td>
+                    {% for value in row %}
+                    <td>
+                        {% if value == 'benign' %}
+                            <span class="badge badge-success">{{ value }}</span>
+                        {% elif value == 'malware' or 'malicious' in value|lower %}
+                            <span class="badge badge-error">{{ value }}</span>
+                        {% else %}
+                            {{ value }}
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Características Principales -->
+<div class="card">
+    <h2 class="card-title">Características Principales del Dataset</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+        <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 6px;">
+            <strong style="color: var(--accent);">Características Temporales</strong>
+            <ul style="color: var(--text-secondary); margin-top: 0.5rem; font-size: 0.875rem; margin-left: 1.5rem;">
+                <li>duration: Duración del flujo</li>
+                <li>*_fiat: Tiempos inter-arribo forward</li>
+                <li>*_biat: Tiempos inter-arribo backward</li>
+                <li>*_flowiat: Tiempos inter-arribo del flujo</li>
+            </ul>
+        </div>
+
+        <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 6px;">
+            <strong style="color: var(--success);">Características de Paquetes</strong>
+            <ul style="color: var(--text-secondary); margin-top: 0.5rem; font-size: 0.875rem; margin-left: 1.5rem;">
+                <li>total_fpackets: Paquetes forward</li>
+                <li>total_bpackets: Paquetes backward</li>
+                <li>*_fpktl: Longitud paquetes forward</li>
+                <li>*_bpktl: Longitud paquetes backward</li>
+            </ul>
+        </div>
+
+        <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 6px;">
+            <strong style="color: var(--warning);">Características de Bytes</strong>
+            <ul style="color: var(--text-secondary); margin-top: 0.5rem; font-size: 0.875rem; margin-left: 1.5rem;">
+                <li>total_fpktl: Total bytes forward</li>
+                <li>total_bpktl: Total bytes backward</li>
+                <li>Init_Win_bytes_*: Ventana inicial TCP</li>
+                <li>Act_data_pkt_forward: Paquetes con datos</li>
+            </ul>
+        </div>
+
+        <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 6px;">
+            <strong style="color: var(--error);">Características de Flags</strong>
+            <ul style="color: var(--text-secondary); margin-top: 0.5rem; font-size: 0.875rem; margin-left: 1.5rem;">
+                <li>*_FIN_flag: Flags FIN</li>
+                <li>*_SYN_flag: Flags SYN</li>
+                <li>*_RST_flag: Flags RST</li>
+                <li>*_PSH_flag: Flags PSH</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Origen de los Datos -->
+<div class="card">
+    <h2 class="card-title">Origen y Referencias</h2>
+    <div style="color: var(--text-secondary); line-height: 1.8;">
+        <p style="margin-bottom: 1rem;">
+            <strong style="color: var(--text-primary);">Fuente:</strong>
+            Canadian Institute for Cybersecurity, University of New Brunswick
+        </p>
+        <p style="margin-bottom: 1rem;">
+            <strong style="color: var(--text-primary);">URL:</strong>
+            <a href="https://www.unb.ca/cic/datasets/android-adware.html"
+               style="color: var(--accent);"
+               target="_blank">
+                https://www.unb.ca/cic/datasets/android-adware.html
+            </a>
+        </p>
+        <p>
+            <strong style="color: var(--text-primary);">Referencia:</strong><br>
+            Arash Habibi Lashkari, Andi Fitriah A. Kadir, Hugo Gonzalez, Kenneth Fon Mbah and Ali A. Ghorbani,
+            "Towards a Network-Based Framework for Android Malware Detection and Characterization",
+            In the proceeding of the 15th International Conference on Privacy, Security and Trust, PST, Calgary, Canada, 2017.
+        </p>
+    </div>
+</div>
+
+<div style="text-align: center; margin-top: 2rem;">
+    <a href="/dashboard/" class="btn">Ver Análisis del Dataset</a>
+</div>
+{% endblock %}
+

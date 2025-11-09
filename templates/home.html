@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Malware Detector{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>Detección de Malware en Android</h1>
+    <p>Análisis avanzado usando Random Forest Classifier y Regressor</p>
+    <a href="/dashboard/" class="btn">Ver Dashboard</a>
+</div>
+
+<div class="features">
+    <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <div class="feature-title">Clasificación</div>
+        <p style="color: var(--text-secondary);">
+            Random Forest Classifier para detectar malware con métricas detalladas de F1 Score, Precisión y Recall.
+        </p>
+        <a href="/classification/" class="btn" style="margin-top: 1rem;">Ver Análisis</a>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <div class="feature-title">Regresión</div>
+        <p style="color: var(--text-secondary);">
+            Random Forest Regressor para predecir la duración del tráfico de red con métricas de R² y RMSE.
+        </p>
+        <a href="/regression/" class="btn" style="margin-top: 1rem;">Ver Análisis</a>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-icon">📁</div>
+        <div class="feature-title">Dataset</div>
+        <p style="color: var(--text-secondary);">
+            Explora el conjunto de datos CICAAGM con tráfico de red de aplicaciones Android benignas y maliciosas.
+        </p>
+        <a href="/dataset/" class="btn" style="margin-top: 1rem;">Ver Dataset</a>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 3rem;">
+    <h2 class="card-title">Sobre el Proyecto</h2>
+    <p style="color: var(--text-secondary); line-height: 1.8;">
+        Este proyecto implementa un sistema de detección de malware en Android utilizando técnicas de Machine Learning.
+        El análisis se basa en el dataset <strong>CICAAGM</strong> que contiene características del tráfico de red de
+        aplicaciones Android. El servidor procesa los datos de forma independiente y entrena dos modelos:
+    </p>
+    <ul style="color: var(--text-secondary); margin-top: 1rem; margin-left: 2rem; line-height: 2;">
+        <li><strong>Random Forest Classifier:</strong> Para clasificar aplicaciones como benignas o maliciosas</li>
+        <li><strong>Random Forest Regressor:</strong> Para predecir la duración del tráfico de red</li>
+    </ul>
+</div>
+
+<div class="card">
+    <h2 class="card-title">Características del Dataset</h2>
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-label">Total de Aplicaciones</div>
+            <div class="metric-value">1,900</div>
+            <span class="badge badge-success">Dataset Completo</span>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Adware</div>
+            <div class="metric-value">250</div>
+            <span class="badge badge-warning">Malicioso</span>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">General Malware</div>
+            <div class="metric-value">150</div>
+            <span class="badge badge-error">Malicioso</span>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Benignas</div>
+            <div class="metric-value">1,500</div>
+            <span class="badge badge-success">Seguro</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
