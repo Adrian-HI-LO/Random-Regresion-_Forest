@@ -16,11 +16,12 @@ warnings.filterwarnings('ignore')
 
 
 class MalwareAnalyzer:
-    def __init__(self, dataset_path=None, gdrive_folder_id=None, gdrive_file_id=None, use_subset=False):
+    def __init__(self, dataset_path=None, gdrive_folder_id=None, gdrive_file_id=None, use_subset=False, subset_size=50000):
         self.dataset_path = dataset_path
         self.gdrive_folder_id = gdrive_folder_id
         self.gdrive_file_id = gdrive_file_id
         self.use_subset = use_subset  # Usar solo subset para ahorrar memoria
+        self.subset_size = subset_size  # Tamaño del subset (default 50,000)
         self.df = None
         self.classifier = None
         self.regressor = None
@@ -166,14 +167,14 @@ Coloca el archivo CSV en: dataset/TotalFeatures-ISCXFlowMeter.csv
 
         # Si use_subset es True, cargar solo una muestra para ahorrar memoria
         if self.use_subset:
-            # Cargar solo 50,000 filas (8% del dataset original)
+            # Cargar solo subset_size filas (default 50,000 = 8% del dataset original)
             # Esto reduce el uso de memoria de ~800MB a ~64MB
-            print("⚠️  Modo memoria limitada: Usando subset del dataset (50,000 filas)")
-            self.df = pd.read_csv(self.dataset_path, nrows=50000)
-            print(f"✓ Subset cargado: {len(self.df)} filas, {len(self.df.columns)} columnas")
+            print(f"⚠️  Modo memoria limitada: Usando subset del dataset ({self.subset_size:,} filas)")
+            self.df = pd.read_csv(self.dataset_path, nrows=self.subset_size)
+            print(f"✓ Subset cargado: {len(self.df):,} filas, {len(self.df.columns)} columnas")
         else:
             self.df = pd.read_csv(self.dataset_path)
-            print(f"✓ Dataset completo cargado: {len(self.df)} filas, {len(self.df.columns)} columnas")
+            print(f"✓ Dataset completo cargado: {len(self.df):,} filas, {len(self.df.columns)} columnas")
 
         return self.df
 
