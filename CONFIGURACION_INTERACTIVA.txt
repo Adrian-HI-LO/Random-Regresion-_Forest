@@ -1,0 +1,295 @@
+╔═══════════════════════════════════════════════════════════════════════════╗
+║     ✅ NUEVA FUNCIONALIDAD: CONFIGURACIÓN INTERACTIVA DEL MODELO         ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+🎉 ¡IMPLEMENTADO!
+
+Ahora el CLIENTE FINAL puede configurar interactivamente el tamaño del dataset
+directamente desde la interfaz web, sin necesidad de acceder a Render.
+
+═══════════════════════════════════════════════════════════════════════════
+✨ NUEVA FUNCIONALIDAD
+═══════════════════════════════════════════════════════════════════════════
+
+📍 NUEVA PÁGINA: /configure/
+
+El cliente puede:
+  ✅ Ver el tamaño actual del dataset usado
+  ✅ Seleccionar nuevo tamaño con un slider (5,000 - 631,955 filas)
+  ✅ Ver indicadores visuales de riesgo de memoria
+  ✅ Reentrenar el modelo con el nuevo tamaño
+  ✅ Ver métricas del nuevo modelo entrenado
+
+═══════════════════════════════════════════════════════════════════════════
+🎛️ INTERFAZ DE USUARIO
+═══════════════════════════════════════════════════════════════════════════
+
+PÁGINA: /configure/
+
+┌────────────────────────────────────────────────────────────────────┐
+│ ⚙️ Configurar Modelo                                              │
+├────────────────────────────────────────────────────────────────────┤
+│                                                                    │
+│ 📊 Configuración Actual                                           │
+│   [50,000 filas] [8% del dataset] [✅ Entrenado]                 │
+│                                                                    │
+│ 🎛️ Ajustar Tamaño del Dataset                                    │
+│   Cantidad de Filas:                                              │
+│   ━━━━━━━━━━━●━━━━━━━━━━━━━━━━━━━                              │
+│   5,000        [50,000]        631,955                           │
+│                                                                    │
+│   Nivel de Memoria: [✅ Muy Seguro]                               │
+│   ████████░░░░░░░░░░░░░░░░░░░░ 8%                                │
+│                                                                    │
+│   ✅ ≤50K: Muy Seguro    ⚠️ 50-75K: Moderado                     │
+│   ⚠️ 75-100K: Riesgoso   ❌ >100K: Muy Riesgoso                  │
+│                                                                    │
+│   [🚀 Reentrenar Modelo]  [↺ Restablecer]                        │
+│                                                                    │
+└────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════
+🔄 FLUJO DE USO PARA EL CLIENTE
+═══════════════════════════════════════════════════════════════════════════
+
+1. Cliente entra a la app: https://tu-app.onrender.com/
+
+2. Ve el menú de navegación con nuevo botón: ⚙️ Configurar
+
+3. Hace clic en "Configurar"
+
+4. Ve la configuración actual (por defecto 50,000 filas)
+
+5. Mueve el slider para seleccionar nuevo tamaño:
+   • 25,000 filas → Indicador verde "Muy Seguro"
+   • 75,000 filas → Indicador naranja "Riesgoso" + Advertencia
+   • 150,000 filas → Indicador rojo "Muy Riesgoso" + Advertencia fuerte
+
+6. Hace clic en "🚀 Reentrenar Modelo"
+
+7. Aparece mensaje: "⏳ Entrenando modelo... Esto puede tardar varios minutos"
+
+8. Espera 2-5 minutos (según tamaño)
+
+9. Ve mensaje de éxito: "✅ Modelo reentrenado exitosamente con X filas"
+   + Nuevas métricas (Accuracy, F1-Score, R²)
+
+10. Puede ir al Dashboard para ver los resultados con el nuevo modelo
+
+═══════════════════════════════════════════════════════════════════════════
+⚠️ ADVERTENCIAS AUTOMÁTICAS
+═══════════════════════════════════════════════════════════════════════════
+
+El sistema muestra advertencias según el tamaño seleccionado:
+
+≤ 50,000 FILAS:
+  • Indicador: ✅ Verde "Muy Seguro"
+  • Sin advertencias
+
+50,001 - 75,000 FILAS:
+  • Indicador: ⚠️ Amarillo "Moderado"
+  • Advertencia: "Este tamaño puede ser inestable en plan Free"
+
+75,001 - 100,000 FILAS:
+  • Indicador: ⚠️ Naranja "Riesgoso"
+  • Advertencia: "Alto riesgo de error de memoria en plan Free"
+
+> 100,000 FILAS:
+  • Indicador: ❌ Rojo "Muy Riesgoso"
+  • Advertencia: "PELIGRO: Muy probable que falle en plan Free"
+  • Popup de confirmación antes de entrenar
+
+═══════════════════════════════════════════════════════════════════════════
+🎨 CARACTERÍSTICAS VISUALES
+═══════════════════════════════════════════════════════════════════════════
+
+✅ Slider interactivo (5,000 - 631,955)
+✅ Valor actual en tiempo real
+✅ Barra de memoria con colores
+✅ Indicadores de riesgo dinámicos
+✅ Advertencias contextuales
+✅ Tiempos estimados de entrenamiento
+✅ Guías de referencia por plan
+✅ Confirmación para valores riesgosos
+✅ Mensajes de progreso y estado
+✅ Métricas del nuevo modelo
+✅ Auto-reload después de entrenar
+
+═══════════════════════════════════════════════════════════════════════════
+📊 INFORMACIÓN MOSTRADA AL CLIENTE
+═══════════════════════════════════════════════════════════════════════════
+
+ANTES DE ENTRENAR:
+  • Configuración actual (filas, porcentaje, estado)
+  • Nivel de memoria del tamaño seleccionado
+  • Advertencias si aplica
+  • Tiempos estimados de entrenamiento
+  • Guías por plan (Free, Starter, Standard)
+
+DURANTE ENTRENAMIENTO:
+  • "⏳ Entrenando modelo..."
+  • "Esto puede tardar varios minutos"
+  • Botón deshabilitado
+
+DESPUÉS DE ENTRENAR:
+  • "✅ Modelo reentrenado exitosamente con X filas"
+  • Accuracy del nuevo modelo
+  • F1-Score del nuevo modelo
+  • R² del nuevo modelo
+  • Advertencia si aplicó
+
+═══════════════════════════════════════════════════════════════════════════
+🔧 ARCHIVOS MODIFICADOS/CREADOS
+═══════════════════════════════════════════════════════════════════════════
+
+✅ analyzer/urls.py
+   • Nueva ruta: /configure/
+   • Nueva ruta: /retrain/ (POST)
+
+✅ analyzer/views.py
+   • Nueva vista: configure_model()
+   • Nueva vista: retrain_model()
+
+✅ templates/configure.html (NUEVO)
+   • Interfaz completa de configuración
+   • Slider interactivo
+   • Indicadores visuales
+   • JavaScript para interactividad
+
+✅ templates/base.html
+   • Nuevo enlace en menú: ⚙️ Configurar
+
+═══════════════════════════════════════════════════════════════════════════
+🚀 CÓMO USAR (PARA EL DESARROLLADOR)
+═══════════════════════════════════════════════════════════════════════════
+
+1. Subir cambios a GitHub:
+
+   git add .
+   git commit -m "Agregar configuración interactiva del dataset para cliente"
+   git push origin main
+
+2. En Render, hacer Manual Deploy
+
+3. Esperar 5-10 minutos
+
+4. Acceder a /configure/ en tu app
+
+5. ¡El cliente ya puede configurar el modelo!
+
+═══════════════════════════════════════════════════════════════════════════
+💡 VENTAJAS DE ESTA SOLUCIÓN
+═══════════════════════════════════════════════════════════════════════════
+
+✅ PARA EL CLIENTE:
+  • No necesita conocimientos técnicos
+  • No necesita acceso a Render
+  • Interfaz visual intuitiva
+  • Feedback inmediato
+  • Advertencias claras
+  • Control total sobre el modelo
+
+✅ PARA EL DESARROLLADOR:
+  • No necesitas cambiar variables en Render cada vez
+  • Cliente puede experimentar libremente
+  • Menos soporte técnico
+  • Validaciones automáticas
+  • Manejo de errores robusto
+
+✅ PARA EL SISTEMA:
+  • Validación de límites (5,000 - 631,955)
+  • Advertencias según memoria disponible
+  • Confirmaciones para valores riesgosos
+  • Manejo de errores graceful
+  • Actualización automática de métricas
+
+═══════════════════════════════════════════════════════════════════════════
+🎯 CASOS DE USO
+═══════════════════════════════════════════════════════════════════════════
+
+CASO 1: Cliente quiere demo rápido
+  → Selecciona 25,000 filas
+  → Entrena en ~1 minuto
+  → Ve resultados inmediatamente
+
+CASO 2: Cliente quiere balance
+  → Mantiene 50,000 filas (default)
+  → Seguro y rápido
+  → Buenas métricas
+
+CASO 3: Cliente tiene plan pagado
+  → Selecciona 150,000+ filas
+  → Mejores métricas
+  → Mayor precisión
+
+CASO 4: Cliente experimenta error de memoria
+  → Sistema muestra error claro
+  → Cliente reduce tamaño
+  → Reintenta sin problemas
+
+═══════════════════════════════════════════════════════════════════════════
+⚡ TIEMPOS DE ENTRENAMIENTO
+═══════════════════════════════════════════════════════════════════════════
+
+Estos son los tiempos aproximados mostrados al cliente:
+
+• 25,000 filas:   ~1-2 minutos
+• 50,000 filas:   ~2-3 minutos
+• 75,000 filas:   ~3-5 minutos
+• 100,000 filas:  ~5-7 minutos
+• 150,000+ filas: ~10-15 minutos
+
+═══════════════════════════════════════════════════════════════════════════
+🛡️ SEGURIDAD Y VALIDACIÓN
+═══════════════════════════════════════════════════════════════════════════
+
+✅ Validación en frontend (JavaScript)
+✅ Validación en backend (Python)
+✅ CSRF token en formulario
+✅ Límites estrictos (5K - 632K)
+✅ Mensajes de error claros
+✅ Confirmación para valores riesgosos
+✅ Timeout handling
+✅ Error recovery
+
+═══════════════════════════════════════════════════════════════════════════
+📖 DOCUMENTACIÓN PARA EL CLIENTE
+═══════════════════════════════════════════════════════════════════════════
+
+La página /configure/ incluye sección "💡 Información Importante":
+
+• Límites por plan (Free, Starter, Standard)
+• Tiempos de entrenamiento estimados
+• Consejos de uso
+• Qué hacer si hay errores
+
+═══════════════════════════════════════════════════════════════════════════
+✅ RESUMEN
+═══════════════════════════════════════════════════════════════════════════
+
+ANTES:
+  ❌ Cliente no podía cambiar tamaño del dataset
+  ❌ Había que cambiar variables en Render manualmente
+  ❌ No había feedback visual
+  ❌ No había advertencias
+
+DESPUÉS:
+  ✅ Cliente configura interactivamente desde la web
+  ✅ Slider visual con indicadores de riesgo
+  ✅ Advertencias automáticas según memoria
+  ✅ Reentrenamiento con un clic
+  ✅ Métricas actualizadas inmediatamente
+  ✅ Totalmente autoservicio
+
+═══════════════════════════════════════════════════════════════════════════
+
+🚀 PARA APLICAR:
+
+  git add .
+  git commit -m "Agregar configuración interactiva del dataset"
+  git push origin main
+
+¡Tu cliente podrá configurar el modelo desde la web! 🎉
+
+═══════════════════════════════════════════════════════════════════════════
+

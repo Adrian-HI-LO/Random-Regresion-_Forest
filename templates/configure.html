@@ -1,0 +1,288 @@
+{% extends 'base.html' %}
+
+{% block title %}Configurar Modelo - Malware Detector{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 2rem; font-size: 2.5rem;">⚙️ Configurar Modelo</h1>
+
+<!-- Estado Actual -->
+<div class="card" style="background: linear-gradient(135deg, #1a1f2e 0%, #2d1b3d 100%); border-color: #4a5568; margin-bottom: 2rem;">
+    <h2 class="card-title" style="color: #fbbf24;">📊 Configuración Actual</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
+        <div style="background: rgba(96, 165, 250, 0.1); padding: 1rem; border-radius: 6px; border: 1px solid rgba(96, 165, 250, 0.3);">
+            <div style="color: #9ca3af; font-size: 0.875rem;">Filas Usadas</div>
+            <div style="color: #60a5fa; font-size: 2rem; font-weight: 700;">{{ current_size|floatformat:0 }}</div>
+        </div>
+        <div style="background: rgba(16, 185, 129, 0.1); padding: 1rem; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.3);">
+            <div style="color: #9ca3af; font-size: 0.875rem;">Porcentaje del Dataset</div>
+            <div style="color: #10b981; font-size: 2rem; font-weight: 700;">{{ current_size|floatformat:0|add:"0"|multiply:100|divide:full_dataset_size|floatformat:1 }}%</div>
+        </div>
+        <div style="background: rgba(139, 92, 246, 0.1); padding: 1rem; border-radius: 6px; border: 1px solid rgba(139, 92, 246, 0.3);">
+            <div style="color: #9ca3af; font-size: 0.875rem;">Estado</div>
+            <div style="color: #8b5cf6; font-size: 1.25rem; font-weight: 600;">
+                {% if is_trained %}
+                    ✅ Entrenado
+                {% else %}
+                    ⏳ Sin entrenar
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Formulario de Configuración -->
+<div class="card">
+    <h2 class="card-title">🎛️ Ajustar Tamaño del Dataset</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+        Selecciona cuántas filas del dataset usar para entrenar el modelo.
+        <strong style="color: var(--warning);">⚠️ Valores muy altos pueden causar errores de memoria en plan Free.</strong>
+    </p>
+
+    <form id="retrainForm" style="max-width: 800px;">
+        {% csrf_token %}
+        <div style="margin-bottom: 2rem;">
+            <label for="datasetSize" style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 600;">
+                Cantidad de Filas:
+            </label>
+            <input
+                type="range"
+                id="datasetSize"
+                name="dataset_size"
+                min="5000"
+                max="631955"
+                step="5000"
+                value="{{ current_size }}"
+                style="width: 100%; height: 8px; background: var(--bg-tertiary); border-radius: 5px; outline: none;"
+            >
+            <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.875rem;">
+                <span>5,000</span>
+                <span id="sizeValue" style="color: var(--accent); font-weight: 700; font-size: 1.25rem;">{{ current_size|floatformat:0 }}</span>
+                <span>631,955</span>
+            </div>
+        </div>
+
+        <!-- Indicadores de Memoria -->
+        <div style="margin-bottom: 2rem;">
+            <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="font-weight: 600;">Nivel de Memoria:</span>
+                    <span id="memoryLevel" style="padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.875rem;"></span>
+                </div>
+                <div id="memoryBar" style="height: 8px; background: var(--bg-primary); border-radius: 4px; overflow: hidden;">
+                    <div id="memoryFill" style="height: 100%; transition: all 0.3s; border-radius: 4px;"></div>
+                </div>
+            </div>
+
+            <!-- Guías de Referencia -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; font-size: 0.875rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div style="width: 12px; height: 12px; background: #10b981; border-radius: 2px;"></div>
+                    <span style="color: var(--text-secondary);">≤ 50K: Muy Seguro</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div style="width: 12px; height: 12px; background: #fbbf24; border-radius: 2px;"></div>
+                    <span style="color: var(--text-secondary);">50-75K: Moderado</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div style="width: 12px; height: 12px; background: #f97316; border-radius: 2px;"></div>
+                    <span style="color: var(--text-secondary);">75-100K: Riesgoso</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div style="width: 12px; height: 12px; background: #ef4444; border-radius: 2px;"></div>
+                    <span style="color: var(--text-secondary);">>100K: Muy Riesgoso</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advertencias Dinámicas -->
+        <div id="warningBox" style="display: none; padding: 1rem; background: rgba(251, 191, 36, 0.1); border-left: 3px solid #fbbf24; border-radius: 4px; margin-bottom: 1.5rem;">
+            <p id="warningText" style="color: #fbbf24; margin: 0; font-size: 0.875rem;"></p>
+        </div>
+
+        <!-- Botones -->
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button
+                type="submit"
+                id="retrainBtn"
+                style="background: var(--accent); color: white; border: none; padding: 0.75rem 2rem; border-radius: 6px; font-weight: 600; cursor: pointer; transition: background 0.3s;"
+                onmouseover="this.style.background='var(--accent-hover)'"
+                onmouseout="this.style.background='var(--accent)'"
+            >
+                🚀 Reentrenar Modelo
+            </button>
+            <button
+                type="button"
+                onclick="document.getElementById('datasetSize').value={{ current_size }};updateDisplay();"
+                style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border); padding: 0.75rem 2rem; border-radius: 6px; font-weight: 600; cursor: pointer;"
+            >
+                ↺ Restablecer
+            </button>
+        </div>
+
+        <!-- Mensaje de Estado -->
+        <div id="statusMessage" style="margin-top: 1rem; display: none;"></div>
+    </form>
+</div>
+
+<!-- Información Adicional -->
+<div class="card">
+    <h2 class="card-title">💡 Información Importante</h2>
+    <div style="color: var(--text-secondary); line-height: 1.8;">
+        <p><strong>Plan Free (512 MB RAM):</strong></p>
+        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+            <li>✅ Hasta 50,000 filas: Recomendado</li>
+            <li>⚠️ 50,000 - 75,000 filas: Puede funcionar</li>
+            <li>⚠️ 75,000 - 100,000 filas: Límite máximo</li>
+            <li>❌ Más de 100,000 filas: Probable error de memoria</li>
+        </ul>
+
+        <p style="margin-top: 1rem;"><strong>Tiempos de Entrenamiento:</strong></p>
+        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+            <li>25,000 filas: ~1-2 minutos</li>
+            <li>50,000 filas: ~2-3 minutos</li>
+            <li>100,000 filas: ~5-7 minutos</li>
+        </ul>
+
+        <p style="margin-top: 1rem; padding: 0.75rem; background: rgba(96, 165, 250, 0.1); border-left: 3px solid var(--accent); border-radius: 4px;">
+            <strong>💡 Consejo:</strong> Si experimentas errores de memoria, reduce el tamaño del dataset
+            y vuelve a intentar. El modelo seguirá siendo funcional con menos datos.
+        </p>
+    </div>
+</div>
+
+<script>
+const slider = document.getElementById('datasetSize');
+const sizeValue = document.getElementById('sizeValue');
+const memoryLevel = document.getElementById('memoryLevel');
+const memoryFill = document.getElementById('memoryFill');
+const warningBox = document.getElementById('warningBox');
+const warningText = document.getElementById('warningText');
+const form = document.getElementById('retrainForm');
+const retrainBtn = document.getElementById('retrainBtn');
+const statusMessage = document.getElementById('statusMessage');
+
+function updateDisplay() {
+    const value = parseInt(slider.value);
+    sizeValue.textContent = value.toLocaleString();
+
+    // Actualizar barra de memoria
+    const percentage = (value / 631955) * 100;
+    memoryFill.style.width = percentage + '%';
+
+    // Determinar nivel de riesgo
+    let level, color, warning;
+    if (value <= 50000) {
+        level = '✅ Muy Seguro';
+        color = '#10b981';
+        warning = null;
+    } else if (value <= 75000) {
+        level = '⚠️ Moderado';
+        color = '#fbbf24';
+        warning = 'Este tamaño puede ser inestable en plan Free. Recomendamos 50,000 filas o menos.';
+    } else if (value <= 100000) {
+        level = '⚠️ Riesgoso';
+        color = '#f97316';
+        warning = '⚠️ Advertencia: Alto riesgo de error de memoria en plan Free. Considere usar un plan pagado o reducir el tamaño.';
+    } else {
+        level = '❌ Muy Riesgoso';
+        color = '#ef4444';
+        warning = '❌ PELIGRO: Muy probable que falle en plan Free. Requiere plan Starter o Standard. Reduzca a 100,000 o menos.';
+    }
+
+    memoryLevel.textContent = level;
+    memoryLevel.style.background = color + '20';
+    memoryLevel.style.color = color;
+    memoryLevel.style.border = '1px solid ' + color + '40';
+    memoryFill.style.background = color;
+
+    // Mostrar/ocultar advertencia
+    if (warning) {
+        warningBox.style.display = 'block';
+        warningText.textContent = warning;
+    } else {
+        warningBox.style.display = 'none';
+    }
+}
+
+slider.addEventListener('input', updateDisplay);
+
+// Manejar envío del formulario
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const size = parseInt(slider.value);
+
+    // Confirmar si es riesgoso
+    if (size > 75000) {
+        if (!confirm(`⚠️ Vas a entrenar con ${size.toLocaleString()} filas. Esto puede causar errores de memoria. ¿Continuar?`)) {
+            return;
+        }
+    }
+
+    // Deshabilitar botón
+    retrainBtn.disabled = true;
+    retrainBtn.textContent = '⏳ Entrenando...';
+
+    // Mostrar mensaje de progreso
+    statusMessage.style.display = 'block';
+    statusMessage.innerHTML = '<div style="padding: 1rem; background: rgba(96, 165, 250, 0.1); border-left: 3px solid var(--accent); border-radius: 4px; color: var(--accent);"><strong>⏳ Entrenando modelo...</strong><br>Esto puede tardar varios minutos. Por favor, no cierres esta página.</div>';
+
+    try {
+        const formData = new FormData();
+        formData.append('dataset_size', size);
+
+        // Obtener CSRF token
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+
+        const response = await fetch('/retrain/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrftoken
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            statusMessage.innerHTML = `
+                <div style="padding: 1rem; background: rgba(16, 185, 129, 0.1); border-left: 3px solid #10b981; border-radius: 4px; color: #10b981;">
+                    <strong>✅ ${data.message}</strong><br>
+                    <div style="margin-top: 0.5rem; font-size: 0.875rem;">
+                        • Accuracy: ${(data.new_metrics.classification.test_accuracy * 100).toFixed(2)}%<br>
+                        • F1-Score: ${(data.new_metrics.classification.test_f1 * 100).toFixed(2)}%<br>
+                        • R²: ${data.new_metrics.regression.test_r2.toFixed(4)}
+                    </div>
+                    ${data.warning ? '<br><span style="color: #fbbf24;">⚠️ ' + data.warning + '</span>' : ''}
+                </div>
+            `;
+
+            // Actualizar valor actual
+            setTimeout(() => {
+                location.reload();
+            }, 3000);
+        } else {
+            statusMessage.innerHTML = `
+                <div style="padding: 1rem; background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; border-radius: 4px; color: #ef4444;">
+                    <strong>❌ Error:</strong> ${data.error}
+                </div>
+            `;
+        }
+    } catch (error) {
+        statusMessage.innerHTML = `
+            <div style="padding: 1rem; background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; border-radius: 4px; color: #ef4444;">
+                <strong>❌ Error de conexión:</strong> ${error.message}
+            </div>
+        `;
+    } finally {
+        retrainBtn.disabled = false;
+        retrainBtn.textContent = '🚀 Reentrenar Modelo';
+    }
+});
+
+// Inicializar display
+updateDisplay();
+</script>
+
+{% endblock %}
+
