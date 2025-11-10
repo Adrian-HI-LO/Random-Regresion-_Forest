@@ -154,16 +154,37 @@
     <div class="metrics-grid">
         <div class="metric-card">
             <div class="metric-label">MSE (Train)</div>
-            <div class="metric-value" style="font-size: 1.5rem;">{{ metrics.train.mse|floatformat:2 }}</div>
+            <div class="metric-value" style="font-size: 1.25rem; color: var(--warning);">{{ metrics.train.mse|floatformat:0|slice:":15" }}</div>
+            <p style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.5rem;">
+                ≈ {{ metrics.train.mse|floatformat:"0" }} × 10¹³
+            </p>
         </div>
         <div class="metric-card">
             <div class="metric-label">MSE (Validation)</div>
-            <div class="metric-value" style="font-size: 1.5rem;">{{ metrics.validation.mse|floatformat:2 }}</div>
+            <div class="metric-value" style="font-size: 1.25rem; color: var(--warning);">{{ metrics.validation.mse|floatformat:0|slice:":15" }}</div>
+            <p style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.5rem;">
+                ≈ {{ metrics.validation.mse|floatformat:"0" }} × 10¹³
+            </p>
         </div>
         <div class="metric-card">
             <div class="metric-label">MSE (Test)</div>
-            <div class="metric-value" style="font-size: 1.5rem;">{{ metrics.test.mse|floatformat:2 }}</div>
+            <div class="metric-value" style="font-size: 1.25rem; color: var(--error);">{{ metrics.test.mse|floatformat:0|slice:":15" }}</div>
+            <p style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.5rem;">
+                ≈ {{ metrics.test.mse|floatformat:"0" }} × 10¹³
+            </p>
         </div>
+    </div>
+    <div style="background: rgba(248, 81, 73, 0.1); padding: 1rem; border-left: 3px solid var(--error); border-radius: 4px; margin-top: 1rem;">
+        <p style="color: var(--error); font-size: 0.875rem; margin: 0;">
+            <strong>⚠️ Nota Importante:</strong> Los valores de MSE son extremadamente altos (orden de 10¹³ - 10¹⁴).
+            Esto indica que:
+        </p>
+        <ul style="color: var(--text-secondary); font-size: 0.875rem; margin-top: 0.5rem; margin-left: 1.5rem;">
+            <li>El rango de valores de la variable objetivo (duración) es muy amplio</li>
+            <li>Puede haber outliers extremos en los datos</li>
+            <li>Se recomienda usar <strong>RMSE</strong> o <strong>MAE</strong> para mejor interpretación</li>
+            <li>Considera escalar/normalizar la variable objetivo si se necesita mejorar el modelo</li>
+        </ul>
     </div>
 </div>
 
@@ -292,24 +313,25 @@ const metricsData = {
     }
 };
 
+// Generar datos de muestra para todas las gráficas
+const numPoints = 100;
+const actualValues = [];
+const predictedValues = [];
+
+// Simular datos basados en R² score
+const r2 = metricsData.test.r2;
+const noise = (1 - r2) * 50; // Ruido basado en R²
+
+for (let i = 0; i < numPoints; i++) {
+    const actual = Math.random() * 100;
+    const predicted = actual + (Math.random() - 0.5) * noise;
+    actualValues.push(actual);
+    predictedValues.push(predicted);
+}
+
 // Gráfica 1: Predicciones vs Valores Reales (Scatter Plot)
 const predictionsCtx = document.getElementById('predictionsChart');
 if (predictionsCtx) {
-    // Generar datos de muestra para visualización
-    const numPoints = 100;
-    const actualValues = [];
-    const predictedValues = [];
-
-    // Simular datos basados en R² score
-    const r2 = metricsData.test.r2;
-    const noise = (1 - r2) * 50; // Ruido basado en R²
-
-    for (let i = 0; i < numPoints; i++) {
-        const actual = Math.random() * 100;
-        const predicted = actual + (Math.random() - 0.5) * noise;
-        actualValues.push(actual);
-        predictedValues.push(predicted);
-    }
 
     new Chart(predictionsCtx, {
         type: 'scatter',
