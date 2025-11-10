@@ -212,8 +212,12 @@ def configure_model(request):
         'paid': 150000,     # Requiere plan pagado
     }
 
+    # Calcular porcentaje
+    percentage = round((current_size / 631955) * 100, 1)
+
     context = {
         'current_size': current_size,
+        'percentage': percentage,
         'using_subset': using_subset,
         'full_dataset_size': 631955,
         'memory_limits': memory_limits,
