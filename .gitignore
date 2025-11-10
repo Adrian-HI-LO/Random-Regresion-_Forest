@@ -1,1 +1,47 @@
+# Dataset y cache
 /dataset
+/temp_data
+/staticfiles
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.env
+.venv
+venv/
+ENV/
+
+# Django
+db.sqlite3
+*.log
+
+# Archivos de documentación temporal (opcional - descomenta si no los quieres en git)
+RESPUESTA_RENDER.txt
+RESUMEN_FINAL.txt
+README_GDRIVE.txt
+INSTRUCCIONES_GDRIVE.md
+GDRIVE_SETUP.md
+test_gdrive_download.py
+start_server.sh
+RENDER_DEPLOY.md
+INSTRUCCIONES.txt
+GUIA_DEPLOY.txt
+EMPEZAR_AQUI.txt
+deploy_to_github.sh
+check_gdrive_setup.py
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+

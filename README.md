@@ -1,20 +1,34 @@
-# Servidor Django - Detección de Malware en Android
+# 🛡️ Malware Detection API - Random Forest
 
-Sistema de análisis de malware en Android utilizando Random Forest Classifier y Regressor, con interfaz web oscura y minimalista.
+Sistema de detección de malware en Android utilizando Machine Learning (Random Forest) con Django REST API. Incluye clasificación de malware y predicción de duración de tráfico de red.
 
-## 🚀 Características
+## ✨ Características
 
-- **Random Forest Classifier**: Detección de malware con métricas de F1 Score, Precision, Recall y Accuracy
-- **Random Forest Regressor**: Predicción de duración del tráfico de red con métricas R², RMSE, MAE y MSE
-- **Procesamiento Independiente**: El servidor procesa los datos de forma independiente al notebook
-- **Interfaz Oscura Minimalista**: Diseño moderno y limpio con tema oscuro
-- **Visualización de Datos**: Tablas interactivas y métricas detalladas
-- **API REST**: Endpoint JSON para obtener todas las métricas
+- **🤖 Random Forest Classifier**: Detección de malware con alta precisión
+- **📊 Random Forest Regressor**: Predicción de duración del tráfico de red
+- **☁️ Google Drive Integration**: Descarga automática de dataset desde la nube
+- **🎨 Interfaz Web Moderna**: Dashboard con tema oscuro y diseño minimalista
+- **📈 Métricas Completas**: Accuracy, Precision, Recall, F1-Score, R², RMSE, MAE, MSE
+- **🔌 REST API**: Endpoint JSON para integración con otras aplicaciones
+- **🚀 Deploy Ready**: Configurado para Render y otros servicios cloud
+
+## 📊 Dataset
+
+- **Fuente**: CICAAGM (CIC Android Malware Dataset)
+- **Registros**: 631,955 muestras
+- **Features**: 80 características de tráfico de red
+- **Clases**: Benign, Malware (Adware, General Malware)
+- **Tamaño**: ~175 MB
+
+### 🌐 Descarga Automática desde Google Drive
+
+El proyecto está configurado para descargar automáticamente el dataset desde Google Drive si no está disponible localmente. Ideal para despliegues en hosting.
 
 ## 📋 Requisitos
 
-- Python 3.8+
-- Dataset CICAAGM (incluido en `dataset/TotalFeatures-ISCXFlowMeter.csv`)
+- Python 3.11+
+- 1+ GB RAM (recomendado para producción)
+- Conexión a Internet (para descarga de dataset)
 
 ## 🔧 Instalación
 
@@ -35,20 +49,59 @@ python manage.py migrate
 
 ## 🎯 Uso
 
-### Iniciar el servidor
+### Desarrollo Local
 
 ```bash
+# 1. Instalar dependencias
+pip install -r requirements.txt
+
+# 2. Ejecutar migraciones
+python manage.py migrate
+
+# 3. Iniciar servidor
 python manage.py runserver
 ```
 
 El servidor estará disponible en: `http://127.0.0.1:8000/`
 
-### Rutas Disponibles
+### 🌐 Rutas Disponibles
 
-- **`/`** - Página de inicio con descripción del proyecto
-- **`/dashboard/`** - Dashboard completo con todas las métricas
-- **`/classification/`** - Análisis detallado de Random Forest Classifier
-- **`/regression/`** - Análisis detallado de Random Forest Regressor
+- **`/`** - Página de inicio
+- **`/dashboard/`** - Dashboard con todas las métricas
+- **`/classification/`** - Análisis del clasificador de malware
+- **`/regression/`** - Análisis del regresor de duración
+- **`/dataset/`** - Vista del dataset (primeras 100 filas)
+- **`/api/metrics/`** - API REST (JSON)
+
+## 🚀 Despliegue en Render
+
+### Configuración Automática
+
+El proyecto está preconfigurado para Render con descarga automática del dataset:
+
+1. **Conecta tu repositorio** en [render.com](https://render.com)
+2. **Crea un Web Service** con:
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `gunicorn malware_detector.wsgi:application --bind 0.0.0.0:$PORT`
+   - **Python Version**: 3.11+
+3. **Deploy**: El dataset se descargará automáticamente en el primer inicio
+
+### ⏱️ Tiempos de Despliegue
+
+- **Primera vez**: 10-20 minutos (incluye descarga de dataset)
+- **Actualizaciones**: 5-15 minutos (usa cache)
+
+### 💰 Planes Recomendados
+
+- **Free**: Funciona pero puede ser lento (512 MB RAM)
+- **Starter** ($7/mes): Rendimiento aceptable
+- **Standard** ($25/mes): Recomendado (2 GB RAM)
+
+## 📚 Documentación Adicional
+
+- **RENDER_DEPLOY.md** - Guía detallada de despliegue en Render
+- **test_gdrive_download.py** - Script para probar descarga del dataset
+- **check_render_ready.py** - Verificar configuración antes de deploy
 - **`/dataset/`** - Exploración del dataset CICAAGM
 - **`/api/metrics/`** - API JSON con todas las métricas
 

@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.conf import settings
 from .ml_models import MalwareAnalyzer
 import os
 
@@ -10,13 +11,30 @@ def initialize_analyzer():
     """Inicializar el analizador si no existe"""
     global analyzer
     if analyzer is None:
-        dataset_path = os.path.join(
+        # Intentar usar el dataset local primero (para desarrollo)
+        local_dataset_path = os.path.join(
             os.path.dirname(os.path.dirname(__file__)),
             'dataset',
             'TotalFeatures-ISCXFlowMeter.csv'
         )
-        analyzer = MalwareAnalyzer(dataset_path)
+
+        # Si existe el dataset local, usarlo; sino, descargar de Google Drive
+        if os.path.exists(local_dataset_path):
+            print("Usando dataset local...")
+            analyzer = MalwareAnalyzer(dataset_path=local_dataset_path)
+        else:
+            print("Dataset local no encontrado. Descargando desde Google Drive...")
+            # Intentar primero con file_id (más confiable), luego con folder_id
+            file_id = getattr(settings, 'GDRIVE_FILE_ID', None)
+            folder_id = getattr(settings, 'GDRIVE_FOLDER_ID', None)
+            analyzer = MalwareAnalyzer(
+                gdrive_file_id=file_id,
+                gdrive_folder_id=folder_id
+            )
+
+        print("Iniciando análisis completo...")
         analyzer.run_full_analysis()
+        print("✓ Análisis completo finalizado")
     return analyzer
 
 

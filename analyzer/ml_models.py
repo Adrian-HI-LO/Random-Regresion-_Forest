@@ -9,13 +9,17 @@ from sklearn.metrics import (
     mean_squared_error, r2_score, mean_absolute_error
 )
 import warnings
+import os
+import gdown
 
 warnings.filterwarnings('ignore')
 
 
 class MalwareAnalyzer:
-    def __init__(self, dataset_path):
+    def __init__(self, dataset_path=None, gdrive_folder_id=None, gdrive_file_id=None):
         self.dataset_path = dataset_path
+        self.gdrive_folder_id = gdrive_folder_id
+        self.gdrive_file_id = gdrive_file_id
         self.df = None
         self.classifier = None
         self.regressor = None
@@ -41,9 +45,125 @@ class MalwareAnalyzer:
         self.clf_metrics = {}
         self.reg_metrics = {}
 
+    def download_dataset_from_gdrive(self):
+        """Descargar dataset desde Google Drive"""
+        if not self.gdrive_folder_id and not self.gdrive_file_id:
+            raise ValueError("No se proporcionó el ID de Google Drive (folder_id o file_id)")
+
+        # Crear directorio temporal si no existe
+        temp_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'temp_data')
+        os.makedirs(temp_dir, exist_ok=True)
+
+        # Ruta donde se guardará el archivo
+        output_path = os.path.join(temp_dir, 'TotalFeatures-ISCXFlowMeter.csv')
+
+        # Si el archivo ya existe, no descargarlo de nuevo
+        if os.path.exists(output_path):
+            print(f"Dataset ya existe en {output_path}")
+            return output_path
+
+        # Método 1: Si tenemos file_id, usar descarga directa (MÁS CONFIABLE)
+        if self.gdrive_file_id:
+            print(f"Descargando dataset desde Google Drive (File ID: {self.gdrive_file_id})...")
+            try:
+                file_url = f"https://drive.google.com/uc?id={self.gdrive_file_id}"
+                gdown.download(file_url, output_path, quiet=False, fuzzy=True)
+
+                if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
+                    print(f"✓ Dataset descargado exitosamente en {output_path}")
+                    print(f"  Tamaño: {os.path.getsize(output_path) / (1024*1024):.2f} MB")
+                    return output_path
+                else:
+                    raise FileNotFoundError("El archivo descargado está vacío o no existe")
+
+            except Exception as e:
+                print(f"Error al descargar con file_id: {str(e)}")
+                if not self.gdrive_folder_id:
+                    raise
+                print("Intentando método alternativo con folder_id...")
+
+        # Método 2: Si tenemos folder_id, intentar descargar carpeta
+        if self.gdrive_folder_id:
+            print(f"Descargando dataset desde Google Drive (Folder ID: {self.gdrive_folder_id})...")
+
+            try:
+                folder_url = f"https://drive.google.com/drive/folders/{self.gdrive_folder_id}"
+                print(f"Intentando descargar carpeta: {folder_url}")
+
+                try:
+                    gdown.download_folder(url=folder_url, output=temp_dir, quiet=False, use_cookies=False, remaining_ok=True)
+                except:
+                    # Si falla, intentar con autenticación de cookies
+                    print("Intentando con cookies...")
+                    gdown.download_folder(url=folder_url, output=temp_dir, quiet=False, use_cookies=True, remaining_ok=True)
+
+                # Buscar el archivo CSV en el directorio descargado
+                for root, dirs, files in os.walk(temp_dir):
+                    for file in files:
+                        if file.endswith('.csv'):
+                            file_path = os.path.join(root, file)
+                            # Si está en un subdirectorio, moverlo al directorio principal
+                            if file_path != output_path:
+                                import shutil
+                                shutil.move(file_path, output_path)
+                            print(f"✓ Dataset descargado exitosamente en {output_path}")
+                            print(f"  Tamaño: {os.path.getsize(output_path) / (1024*1024):.2f} MB")
+                            return output_path
+
+                raise FileNotFoundError("No se encontró ningún archivo CSV en la carpeta descargada")
+
+            except Exception as e:
+                error_msg = f"""
+╔════════════════════════════════════════════════════════════════════════════╗
+║ Error al descargar el dataset desde Google Drive                          ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+Error: {str(e)}
+
+SOLUCIÓN RECOMENDADA:
+═══════════════════════════════════════════════════════════════════════════
+
+Opción 1: Usar el FILE ID directamente (MÁS FÁCIL Y CONFIABLE)
+───────────────────────────────────────────────────────────────────────────
+
+1. Abre el archivo CSV en Google Drive
+2. Haz clic en "Compartir" → "Cualquier persona con el enlace" → "Lector"
+3. Copia el FILE_ID de la URL:
+   https://drive.google.com/file/d/FILE_ID_AQUI/view
+   
+4. Actualiza malware_detector/settings.py:
+   GDRIVE_FILE_ID = 'TU_FILE_ID_AQUI'
+
+Opción 2: Compartir la carpeta públicamente
+───────────────────────────────────────────────────────────────────────────
+
+1. En Google Drive, haz clic derecho en la carpeta
+2. "Compartir" → "Cambiar a cualquier persona con el enlace"
+3. Asegúrate de que el rol sea "Lector"
+4. Guarda los cambios
+
+Opción 3: Usar dataset local para desarrollo
+───────────────────────────────────────────────────────────────────────────
+
+Coloca el archivo CSV en: dataset/TotalFeatures-ISCXFlowMeter.csv
+
+═══════════════════════════════════════════════════════════════════════════
+                """
+                print(error_msg)
+                raise Exception(error_msg)
+
     def load_data(self):
         """Cargar el dataset"""
+        # Si se proporcionó un ID de Google Drive, descargar el dataset
+        if self.gdrive_file_id or self.gdrive_folder_id:
+            self.dataset_path = self.download_dataset_from_gdrive()
+
+        if not self.dataset_path or not os.path.exists(self.dataset_path):
+            raise FileNotFoundError(f"No se encontró el dataset en {self.dataset_path}")
+
+        print(f"Cargando dataset desde: {self.dataset_path}")
         self.df = pd.read_csv(self.dataset_path)
+        print(f"✓ Dataset cargado: {len(self.df)} filas, {len(self.df.columns)} columnas")
         return self.df
 
     def prepare_classification_data(self):
