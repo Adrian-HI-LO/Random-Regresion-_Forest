@@ -148,45 +148,7 @@
     </div>
 </div>
 
-<!-- MSE Detallado -->
-<div class="card">
-    <h2 class="card-title">MSE - Error Cuadrático Medio</h2>
-    <div class="metrics-grid">
-        <div class="metric-card">
-            <div class="metric-label">MSE (Train)</div>
-            <div class="metric-value" style="font-size: 1.25rem; color: var(--warning);">{{ metrics.train.mse|floatformat:0|slice:":15" }}</div>
-            <p style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.5rem;">
-                ≈ {{ metrics.train.mse|floatformat:"0" }} × 10¹³
-            </p>
-        </div>
-        <div class="metric-card">
-            <div class="metric-label">MSE (Validation)</div>
-            <div class="metric-value" style="font-size: 1.25rem; color: var(--warning);">{{ metrics.validation.mse|floatformat:0|slice:":15" }}</div>
-            <p style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.5rem;">
-                ≈ {{ metrics.validation.mse|floatformat:"0" }} × 10¹³
-            </p>
-        </div>
-        <div class="metric-card">
-            <div class="metric-label">MSE (Test)</div>
-            <div class="metric-value" style="font-size: 1.25rem; color: var(--error);">{{ metrics.test.mse|floatformat:0|slice:":15" }}</div>
-            <p style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.5rem;">
-                ≈ {{ metrics.test.mse|floatformat:"0" }} × 10¹³
-            </p>
-        </div>
-    </div>
-    <div style="background: rgba(248, 81, 73, 0.1); padding: 1rem; border-left: 3px solid var(--error); border-radius: 4px; margin-top: 1rem;">
-        <p style="color: var(--error); font-size: 0.875rem; margin: 0;">
-            <strong>⚠️ Nota Importante:</strong> Los valores de MSE son extremadamente altos (orden de 10¹³ - 10¹⁴).
-            Esto indica que:
-        </p>
-        <ul style="color: var(--text-secondary); font-size: 0.875rem; margin-top: 0.5rem; margin-left: 1.5rem;">
-            <li>El rango de valores de la variable objetivo (duración) es muy amplio</li>
-            <li>Puede haber outliers extremos en los datos</li>
-            <li>Se recomienda usar <strong>RMSE</strong> o <strong>MAE</strong> para mejor interpretación</li>
-            <li>Considera escalar/normalizar la variable objetivo si se necesita mejorar el modelo</li>
-        </ul>
-    </div>
-</div>
+
 
 <!-- Gráficas de Regresión -->
 <div class="card">
@@ -201,10 +163,13 @@
         <canvas id="predictionsChart" style="max-height: 400px;"></canvas>
     </div>
 
-    <!-- Gráfica de Residuales -->
+    <!-- Matriz de Confusión del Clasificador (Referencia) -->
     <div style="background: var(--bg-tertiary); padding: 2rem; border-radius: 6px; margin-bottom: 2rem;">
-        <h3 style="color: var(--text-primary); margin-bottom: 1rem;">Distribución de Residuales</h3>
-        <canvas id="residualsChart" style="max-height: 400px;"></canvas>
+        <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">Matriz de Confusión - Clasificador de Malware</h3>
+        <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1rem;">
+            Visualización del rendimiento del clasificador Random Forest (referencia)
+        </p>
+        <canvas id="confusionMatrixChart" style="max-height: 500px;"></canvas>
     </div>
 
     <!-- Gráfica de Métricas Comparativas -->
@@ -428,90 +393,102 @@ if (predictionsCtx) {
     });
 }
 
-// Gráfica 2: Distribución de Residuales
-const residualsCtx = document.getElementById('residualsChart');
-if (residualsCtx) {
-    // Calcular residuales (diferencia entre real y predicho)
-    const residuals = actualValues.map((val, idx) => predictedValues[idx] - val);
+// Gráfica 2: Matriz de Confusión
+const confusionMatrixCtx = document.getElementById('confusionMatrixChart');
+if (confusionMatrixCtx) {
+    // Datos de la matriz de confusión del clasificador
+    const confusionMatrix = {{ confusion_matrix|safe }};
 
-    // Crear histograma de residuales
-    const bins = 20;
-    const minRes = Math.min(...residuals);
-    const maxRes = Math.max(...residuals);
-    const binWidth = (maxRes - minRes) / bins;
+    // Si hay datos de matriz de confusión
+    if (confusionMatrix && confusionMatrix.length > 0) {
+        // Labels de las clases (asumiendo orden: benign, adware, malware)
+        const classLabels = ['Benign', 'Adware', 'Malware'];
 
-    const histogram = new Array(bins).fill(0);
-    const binLabels = [];
+        // Preparar datos para Chart.js (matriz como dataset)
+        const datasets = [];
+        const colors = [
+            'rgba(63, 185, 80, 0.8)',   // Verde para Benign
+            'rgba(88, 166, 255, 0.8)',  // Azul para Adware
+            'rgba(248, 81, 73, 0.8)'    // Rojo para Malware
+        ];
 
-    for (let i = 0; i < bins; i++) {
-        const binStart = minRes + i * binWidth;
-        binLabels.push(binStart.toFixed(1));
-    }
-
-    residuals.forEach(res => {
-        const binIndex = Math.min(Math.floor((res - minRes) / binWidth), bins - 1);
-        histogram[binIndex]++;
-    });
-
-    new Chart(residualsCtx, {
-        type: 'bar',
-        data: {
-            labels: binLabels,
-            datasets: [{
-                label: 'Frecuencia de Residuales',
-                data: histogram,
-                backgroundColor: 'rgba(139, 92, 246, 0.7)',
-                borderColor: 'rgba(139, 92, 246, 1)',
+        // Crear un dataset por cada clase predicha
+        confusionMatrix.forEach((row, rowIdx) => {
+            datasets.push({
+                label: `Predicho: ${classLabels[rowIdx]}`,
+                data: row,
+                backgroundColor: colors[rowIdx],
+                borderColor: colors[rowIdx].replace('0.8', '1'),
                 borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            aspectRatio: 2,
-            plugins: {
-                legend: {
-                    display: true,
-                    labels: { color: '#c9d1d9', font: { size: 12 } }
-                },
-                title: {
-                    display: true,
-                    text: 'Distribución de Errores del Modelo',
-                    color: '#c9d1d9',
-                    font: { size: 14, weight: 'bold' }
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(22, 27, 34, 0.95)',
-                    titleColor: '#58a6ff',
-                    bodyColor: '#c9d1d9',
-                    borderColor: '#30363d',
-                    borderWidth: 1
-                }
+            });
+        });
+
+        new Chart(confusionMatrixCtx, {
+            type: 'bar',
+            data: {
+                labels: classLabels,
+                datasets: datasets
             },
-            scales: {
-                x: {
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 1.5,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: { color: '#c9d1d9', font: { size: 12 } }
+                    },
                     title: {
                         display: true,
-                        text: 'Residuales (Predicho - Real)',
+                        text: 'Rendimiento del Clasificador por Clase',
                         color: '#c9d1d9',
-                        font: { size: 13, weight: 'bold' }
+                        font: { size: 14, weight: 'bold' }
                     },
-                    grid: { color: 'rgba(48, 54, 61, 0.5)' },
-                    ticks: { color: '#8b949e', maxRotation: 45, minRotation: 45 }
+                    tooltip: {
+                        backgroundColor: 'rgba(22, 27, 34, 0.95)',
+                        titleColor: '#58a6ff',
+                        bodyColor: '#c9d1d9',
+                        borderColor: '#30363d',
+                        borderWidth: 1,
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.dataset.label || '';
+                                const value = context.parsed.y;
+                                const realClass = classLabels[context.dataIndex];
+                                return `${label} como ${realClass}: ${value} casos`;
+                            }
+                        }
+                    }
                 },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Frecuencia',
-                        color: '#c9d1d9',
-                        font: { size: 13, weight: 'bold' }
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Clase Real',
+                            color: '#c9d1d9',
+                            font: { size: 13, weight: 'bold' }
+                        },
+                        grid: { color: 'rgba(48, 54, 61, 0.5)' },
+                        ticks: { color: '#8b949e' }
                     },
-                    grid: { color: 'rgba(48, 54, 61, 0.5)' },
-                    ticks: { color: '#8b949e' }
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Número de Casos',
+                            color: '#c9d1d9',
+                            font: { size: 13, weight: 'bold' }
+                        },
+                        grid: { color: 'rgba(48, 54, 61, 0.5)' },
+                        ticks: { color: '#8b949e' }
+                    }
                 }
             }
-        }
-    });
+        });
+    } else {
+        // Si no hay datos, mostrar mensaje
+        confusionMatrixCtx.parentElement.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">Matriz de confusión no disponible</p>';
+    }
 }
 
 // Gráfica 3: Comparación de Métricas por Conjunto
