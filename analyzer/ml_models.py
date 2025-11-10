@@ -16,10 +16,11 @@ warnings.filterwarnings('ignore')
 
 
 class MalwareAnalyzer:
-    def __init__(self, dataset_path=None, gdrive_folder_id=None, gdrive_file_id=None):
+    def __init__(self, dataset_path=None, gdrive_folder_id=None, gdrive_file_id=None, use_subset=False):
         self.dataset_path = dataset_path
         self.gdrive_folder_id = gdrive_folder_id
         self.gdrive_file_id = gdrive_file_id
+        self.use_subset = use_subset  # Usar solo subset para ahorrar memoria
         self.df = None
         self.classifier = None
         self.regressor = None
@@ -162,8 +163,18 @@ Coloca el archivo CSV en: dataset/TotalFeatures-ISCXFlowMeter.csv
             raise FileNotFoundError(f"No se encontró el dataset en {self.dataset_path}")
 
         print(f"Cargando dataset desde: {self.dataset_path}")
-        self.df = pd.read_csv(self.dataset_path)
-        print(f"✓ Dataset cargado: {len(self.df)} filas, {len(self.df.columns)} columnas")
+
+        # Si use_subset es True, cargar solo una muestra para ahorrar memoria
+        if self.use_subset:
+            # Cargar solo 50,000 filas (8% del dataset original)
+            # Esto reduce el uso de memoria de ~800MB a ~64MB
+            print("⚠️  Modo memoria limitada: Usando subset del dataset (50,000 filas)")
+            self.df = pd.read_csv(self.dataset_path, nrows=50000)
+            print(f"✓ Subset cargado: {len(self.df)} filas, {len(self.df.columns)} columnas")
+        else:
+            self.df = pd.read_csv(self.dataset_path)
+            print(f"✓ Dataset completo cargado: {len(self.df)} filas, {len(self.df.columns)} columnas")
+
         return self.df
 
     def prepare_classification_data(self):
@@ -205,11 +216,16 @@ Coloca el archivo CSV en: dataset/TotalFeatures-ISCXFlowMeter.csv
 
     def train_classifier(self):
         """Entrenar Random Forest Classifier"""
+        # Reducir n_estimators si usamos subset (para memoria limitada)
+        n_trees = 20 if self.use_subset else 100
+
         self.classifier = RandomForestClassifier(
-            n_estimators=100,
+            n_estimators=n_trees,
+            max_depth=15 if self.use_subset else None,  # Limitar profundidad
             random_state=42,
-            n_jobs=-1
+            n_jobs=1  # Cambiar de -1 a 1 para evitar usar todos los cores
         )
+        print(f"Entrenando clasificador con {n_trees} árboles...")
         self.classifier.fit(self.X_train_clf, self.y_train_clf)
 
         # Predicciones
@@ -292,11 +308,16 @@ Coloca el archivo CSV en: dataset/TotalFeatures-ISCXFlowMeter.csv
 
     def train_regressor(self):
         """Entrenar Random Forest Regressor"""
+        # Reducir n_estimators si usamos subset (para memoria limitada)
+        n_trees = 20 if self.use_subset else 100
+
         self.regressor = RandomForestRegressor(
-            n_estimators=100,
+            n_estimators=n_trees,
+            max_depth=15 if self.use_subset else None,  # Limitar profundidad
             random_state=42,
-            n_jobs=-1
+            n_jobs=1  # Cambiar de -1 a 1 para evitar usar todos los cores
         )
+        print(f"Entrenando regresor con {n_trees} árboles...")
         self.regressor.fit(self.X_train_reg, self.y_train_reg)
 
         # Predicciones
@@ -349,16 +370,33 @@ Coloca el archivo CSV en: dataset/TotalFeatures-ISCXFlowMeter.csv
 
     def run_full_analysis(self):
         """Ejecutar análisis completo"""
+        import gc
+
         # Cargar datos
         self.load_data()
 
         # Clasificación
+        print("Preparando datos de clasificación...")
         self.prepare_classification_data()
         self.train_classifier()
 
+        # Liberar memoria después de clasificación
+        if self.use_subset:
+            print("Liberando memoria...")
+            gc.collect()
+
         # Regresión
+        print("Preparando datos de regresión...")
         self.prepare_regression_data()
         self.train_regressor()
+
+        # Liberar memoria final
+        if self.use_subset:
+            # Eliminar dataframe original para liberar memoria
+            del self.df
+            self.df = None
+            gc.collect()
+            print("✓ Memoria liberada")
 
         return {
             'classification': self.clf_metrics,

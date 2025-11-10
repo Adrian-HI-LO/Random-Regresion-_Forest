@@ -27,9 +27,14 @@ def initialize_analyzer():
             # Intentar primero con file_id (más confiable), luego con folder_id
             file_id = getattr(settings, 'GDRIVE_FILE_ID', None)
             folder_id = getattr(settings, 'GDRIVE_FOLDER_ID', None)
+
+            # En producción (Render), usar subset para ahorrar memoria
+            use_subset = os.environ.get('USE_DATASET_SUBSET', 'true').lower() == 'true'
+
             analyzer = MalwareAnalyzer(
                 gdrive_file_id=file_id,
-                gdrive_folder_id=folder_id
+                gdrive_folder_id=folder_id,
+                use_subset=use_subset  # Usar solo subset en producción
             )
 
         print("Iniciando análisis completo...")
