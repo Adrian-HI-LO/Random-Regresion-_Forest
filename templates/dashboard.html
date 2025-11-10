@@ -112,23 +112,10 @@
             <div class="metric-value">{{ reg_metrics.test.r2|floatformat:4 }}</div>
             <span class="badge badge-success">Test</span>
         </div>
-        <div class="metric-card">
-            <div class="metric-label">RMSE (Test)</div>
-            <div class="metric-value">{{ reg_metrics.test.rmse|floatformat:2 }}</div>
-            <span class="badge badge-warning">Test</span>
-        </div>
+
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
-        <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 6px;">
-            <div style="color: var(--text-secondary); font-size: 0.875rem;">MSE (Test)</div>
-            <div style="font-size: 1.5rem; color: var(--accent);">{{ reg_metrics.test.mse|floatformat:2 }}</div>
-        </div>
-        <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 6px;">
-            <div style="color: var(--text-secondary); font-size: 0.875rem;">MAE (Test)</div>
-            <div style="font-size: 1.5rem; color: var(--accent);">{{ reg_metrics.test.mae|floatformat:2 }}</div>
-        </div>
-    </div>
+
 </div>
 
 <!-- Comparación de Conjuntos -->
@@ -181,28 +168,24 @@
                     <tr>
                         <th>Conjunto</th>
                         <th>R²</th>
-                        <th>RMSE</th>
-                        <th>MAE</th>
+
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td><strong>Train</strong></td>
                         <td>{{ reg_metrics.train.r2|floatformat:4 }}</td>
-                        <td>{{ reg_metrics.train.rmse|floatformat:2 }}</td>
-                        <td>{{ reg_metrics.train.mae|floatformat:2 }}</td>
+
                     </tr>
                     <tr>
                         <td><strong>Validation</strong></td>
                         <td>{{ reg_metrics.validation.r2|floatformat:4 }}</td>
-                        <td>{{ reg_metrics.validation.rmse|floatformat:2 }}</td>
-                        <td>{{ reg_metrics.validation.mae|floatformat:2 }}</td>
+
                     </tr>
                     <tr>
                         <td><strong>Test</strong></td>
                         <td>{{ reg_metrics.test.r2|floatformat:4 }}</td>
-                        <td>{{ reg_metrics.test.rmse|floatformat:2 }}</td>
-                        <td>{{ reg_metrics.test.mae|floatformat:2 }}</td>
+
                     </tr>
                 </tbody>
             </table>

@@ -41,46 +41,7 @@
     </div>
 </div>
 
-<!-- Todas las Métricas -->
-<div class="card">
-    <h2 class="card-title">Métricas Completas por Conjunto</h2>
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Conjunto de Datos</th>
-                    <th>R² Score</th>
-                    <th>RMSE</th>
-                    <th>MAE</th>
-                    <th>MSE</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><strong>Entrenamiento</strong></td>
-                    <td><strong style="color: var(--success);">{{ metrics.train.r2|floatformat:4 }}</strong></td>
-                    <td>{{ metrics.train.rmse|floatformat:2 }}</td>
-                    <td>{{ metrics.train.mae|floatformat:2 }}</td>
-                    <td>{{ metrics.train.mse|floatformat:2 }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Validación</strong></td>
-                    <td><strong style="color: var(--warning);">{{ metrics.validation.r2|floatformat:4 }}</strong></td>
-                    <td>{{ metrics.validation.rmse|floatformat:2 }}</td>
-                    <td>{{ metrics.validation.mae|floatformat:2 }}</td>
-                    <td>{{ metrics.validation.mse|floatformat:2 }}</td>
-                </tr>
-                <tr style="background-color: rgba(88, 166, 255, 0.1);">
-                    <td><strong>Test</strong></td>
-                    <td><strong style="color: var(--accent);">{{ metrics.test.r2|floatformat:4 }}</strong></td>
-                    <td>{{ metrics.test.rmse|floatformat:2 }}</td>
-                    <td>{{ metrics.test.mae|floatformat:2 }}</td>
-                    <td>{{ metrics.test.mse|floatformat:2 }}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+
 
 <!-- Métricas Detalladas -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
@@ -105,47 +66,9 @@
         </p>
     </div>
 
-    <div class="card">
-        <h3 class="card-title">RMSE</h3>
-        <div style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: 6px; margin-bottom: 1rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                <span style="color: var(--text-secondary);">Train</span>
-                <strong style="color: var(--accent);">{{ metrics.train.rmse|floatformat:2 }}</strong>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                <span style="color: var(--text-secondary);">Validation</span>
-                <strong style="color: var(--accent);">{{ metrics.validation.rmse|floatformat:2 }}</strong>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="color: var(--text-secondary);">Test</span>
-                <strong style="color: var(--warning); font-size: 1.2rem;">{{ metrics.test.rmse|floatformat:2 }}</strong>
-            </div>
-        </div>
-        <p style="color: var(--text-secondary); font-size: 0.875rem;">
-            Raíz del error cuadrático medio (Root Mean Squared Error)
-        </p>
-    </div>
 
-    <div class="card">
-        <h3 class="card-title">MAE</h3>
-        <div style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: 6px; margin-bottom: 1rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                <span style="color: var(--text-secondary);">Train</span>
-                <strong style="color: var(--accent);">{{ metrics.train.mae|floatformat:2 }}</strong>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                <span style="color: var(--text-secondary);">Validation</span>
-                <strong style="color: var(--accent);">{{ metrics.validation.mae|floatformat:2 }}</strong>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="color: var(--text-secondary);">Test</span>
-                <strong style="color: var(--warning); font-size: 1.2rem;">{{ metrics.test.mae|floatformat:2 }}</strong>
-            </div>
-        </div>
-        <p style="color: var(--text-secondary); font-size: 0.875rem;">
-            Error absoluto medio (Mean Absolute Error)
-        </p>
-    </div>
+
+
 </div>
 
 
@@ -224,24 +147,7 @@
                 Mide qué tan bien el modelo explica la variabilidad de los datos. Un valor de 1.0 indica predicciones perfectas, mientras que 0.0 indica que el modelo no es mejor que predecir la media.
             </p>
         </div>
-        <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 6px;">
-            <strong style="color: var(--success);">RMSE (Root Mean Squared Error)</strong>
-            <p style="color: var(--text-secondary); margin-top: 0.5rem; font-size: 0.875rem;">
-                Raíz cuadrada del promedio de los errores al cuadrado. Da más peso a errores grandes. Se expresa en las mismas unidades que la variable objetivo.
-            </p>
-        </div>
-        <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 6px;">
-            <strong style="color: var(--warning);">MAE (Mean Absolute Error)</strong>
-            <p style="color: var(--text-secondary); margin-top: 0.5rem; font-size: 0.875rem;">
-                Promedio de las diferencias absolutas entre predicciones y valores reales. Más fácil de interpretar que RMSE.
-            </p>
-        </div>
-        <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 6px;">
-            <strong style="color: var(--error);">MSE (Mean Squared Error)</strong>
-            <p style="color: var(--text-secondary); margin-top: 0.5rem; font-size: 0.875rem;">
-                Promedio de los errores al cuadrado. Penaliza más los errores grandes. RMSE es su raíz cuadrada.
-            </p>
-        </div>
+
     </div>
 </div>
 
@@ -488,7 +394,6 @@ if (confusionMatrixCtx) {
     } else {
         // Si no hay datos, mostrar mensaje
         confusionMatrixCtx.parentElement.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">Matriz de confusión no disponible</p>';
-    }
 }
 
 // Gráfica 3: Comparación de Métricas por Conjunto

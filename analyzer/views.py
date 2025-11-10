@@ -98,7 +98,7 @@ def regression_view(request):
     context = {
         'metrics': analyzer_instance.reg_metrics,
         'feature_importance': analyzer_instance.get_feature_importance('regressor')[:10],
-        'confusion_matrix': analyzer_instance.clf_metrics.get('test', {}).get('confusion_matrix', []),
+        'confusion_matrix': analyzer_instance.clf_metrics.get('confusion_matrix', []),
         'dataset_info': {
             'using_subset': analyzer_instance.use_subset,
             'subset_size': analyzer_instance.subset_size,
