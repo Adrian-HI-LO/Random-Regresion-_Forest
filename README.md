@@ -1,34 +1,24 @@
-# 🛡️ Malware Detection API - Random Forest
-
+# Network_Security API - Random Forest & Regresor con Django REST y Mongo Atlas
+## Deteccion de Malware en Android usando Machine Learning
 Sistema de detección de malware en Android utilizando Machine Learning (Random Forest) con Django REST API. Incluye clasificación de malware y predicción de duración de tráfico de red.
 
-## ✨ Características
+## Características
 
-- **🤖 Random Forest Classifier**: Detección de malware con alta precisión
-- **📊 Random Forest Regressor**: Predicción de duración del tráfico de red
-- **☁️ Google Drive Integration**: Descarga automática de dataset desde la nube
-- **🎨 Interfaz Web Moderna**: Dashboard con tema oscuro y diseño minimalista
-- **📈 Métricas Completas**: Accuracy, Precision, Recall, F1-Score, R², RMSE, MAE, MSE
-- **🔌 REST API**: Endpoint JSON para integración con otras aplicaciones
-- **🚀 Deploy Ready**: Configurado para Render y otros servicios cloud
+- **Random Forest Classifier**: Detección de malware con alta precisión
+- **Random Forest Regressor**: Predicción de duración del tráfico de red
+- **️Mongo Atlas (Base de Datos: network_security , Cluster 0) Integration**: Descarga automática de dataset desde la nube
+- **Interfaz Web Moderna**: Dashboard con tema oscuro y diseño minimalista
+- **Métricas Completas**: Accuracy, Precision, Recall, F1-Score, R², RMSE, MAE, MSE
+- **REST API**: Endpoint JSON para integración con otras aplicaciones
+- **Deploy Ready**: Configurado para Render y otros servicios cloud
 
-## 📊 Dataset
+## Dataset
 
 - **Fuente**: CICAAGM (CIC Android Malware Dataset)
 - **Registros**: 631,955 muestras
 - **Features**: 80 características de tráfico de red
 - **Clases**: Benign, Malware (Adware, General Malware)
 - **Tamaño**: ~175 MB
-
-### 🌐 Descarga Automática desde Google Drive
-
-El proyecto está configurado para descargar automáticamente el dataset desde Google Drive si no está disponible localmente. Ideal para despliegues en hosting.
-
-## 📋 Requisitos
-
-- Python 3.11+
-- 1+ GB RAM (recomendado para producción)
-- Conexión a Internet (para descarga de dataset)
 
 ## 🔧 Instalación
 
@@ -64,7 +54,7 @@ python manage.py runserver
 
 El servidor estará disponible en: `http://127.0.0.1:8000/`
 
-### 🌐 Rutas Disponibles
+### Rutas Disponibles
 
 - **`/`** - Página de inicio
 - **`/dashboard/`** - Dashboard con todas las métricas
@@ -73,7 +63,7 @@ El servidor estará disponible en: `http://127.0.0.1:8000/`
 - **`/dataset/`** - Vista del dataset (primeras 100 filas)
 - **`/api/metrics/`** - API REST (JSON)
 
-## 🚀 Despliegue en Render
+###  Despliegue en Render
 
 ### Configuración Automática
 
@@ -86,26 +76,25 @@ El proyecto está preconfigurado para Render con descarga automática del datase
    - **Python Version**: 3.11+
 3. **Deploy**: El dataset se descargará automáticamente en el primer inicio
 
-### ⏱️ Tiempos de Despliegue
+### Tiempos de Despliegue
 
 - **Primera vez**: 10-20 minutos (incluye descarga de dataset)
 - **Actualizaciones**: 5-15 minutos (usa cache)
 
-### 💰 Planes Recomendados
+### Planes Recomendados
 
 - **Free**: Funciona pero puede ser lento (512 MB RAM)
 - **Starter** ($7/mes): Rendimiento aceptable
 - **Standard** ($25/mes): Recomendado (2 GB RAM)
 
-## 📚 Documentación Adicional
+## Documentación Adicional
 
 - **RENDER_DEPLOY.md** - Guía detallada de despliegue en Render
-- **test_gdrive_download.py** - Script para probar descarga del dataset
 - **check_render_ready.py** - Verificar configuración antes de deploy
 - **`/dataset/`** - Exploración del dataset CICAAGM
 - **`/api/metrics/`** - API JSON con todas las métricas
 
-## 📊 Métricas Disponibles
+##  Métricas Disponibles
 
 ### Random Forest Classifier
 - **F1 Score** (principal métrica de clasificación)
@@ -125,7 +114,7 @@ El proyecto está preconfigurado para Render con descarga automática del datase
 
 Todas las métricas se muestran para los conjuntos de **entrenamiento**, **validación** y **test**.
 
-## 🎨 Diseño
+## Diseño
 
 La interfaz utiliza un tema oscuro minimalista con:
 - Colores suaves para reducir la fatiga visual
@@ -133,7 +122,7 @@ La interfaz utiliza un tema oscuro minimalista con:
 - Tarjetas y tablas organizadas para fácil lectura
 - Badges y colores para identificar rápidamente estados
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 RandomForestAndRegresor/
@@ -157,7 +146,7 @@ RandomForestAndRegresor/
 └── requirements.txt            # Dependencias del proyecto
 ```
 
-## 🔬 Sobre el Dataset
+## Sobre el Dataset
 
 **CICAAGM Dataset** (Canadian Institute for Cybersecurity - Android Adware and General Malware)
 
@@ -184,12 +173,12 @@ RandomForestAndRegresor/
 - GGtracker
 - Penetho
 
-## 🔗 Referencias
+## Referencias
 
 - Dataset: https://www.unb.ca/cic/datasets/android-adware.html
 - Paper: Arash Habibi Lashkari et al., "Towards a Network-Based Framework for Android Malware Detection and Characterization", PST 2017
 
-## ⚙️ Procesamiento de Datos
+## ⚙Procesamiento de Datos
 
 El servidor realiza el siguiente procesamiento:
 
@@ -201,14 +190,14 @@ El servidor realiza el siguiente procesamiento:
 6. **Cálculo de métricas** para todos los conjuntos
 7. **Análisis de importancia** de características
 
-## 🚀 Optimizaciones
+## Optimizaciones
 
 - Los modelos se entrenan una sola vez al iniciar el servidor
 - Se utiliza `n_jobs=-1` para aprovechar todos los núcleos del CPU
 - Las vistas utilizan caché para mejorar el rendimiento
 - Procesamiento independiente del notebook para evitar dependencias
 
-## 📝 Notas
+## Notas
 
 - La primera carga del servidor puede tardar unos minutos mientras procesa el dataset y entrena los modelos
 - El dataset tiene ~632,000 registros con 80 características
@@ -216,7 +205,7 @@ El servidor realiza el siguiente procesamiento:
 - El F1 Score es la métrica principal para clasificación
 - El R² Score es la métrica principal para regresión
 
-## 🐛 Solución de Problemas
+## Solución de Problemas
 
 Si el servidor no inicia:
 1. Verifica que el dataset esté en `dataset/TotalFeatures-ISCXFlowMeter.csv`
@@ -224,7 +213,7 @@ Si el servidor no inicia:
 3. Ejecuta las migraciones: `python manage.py migrate`
 4. Verifica que el puerto 8000 esté disponible
 
-## 📜 Licencia
+## Licencia
 
 Este proyecto es independiente del notebook original y utiliza el dataset público CICAAGM.
 
